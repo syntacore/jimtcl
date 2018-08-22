@@ -68,7 +68,7 @@
 #ifndef HAVE_USLEEP
 /* XXX: Implement this in terms of select() or nanosleep() */
 #define usleep(US) sleep((US) / 1000000)
-#warning "sub-second sleep not supported"
+#pragma warning("sub-second sleep not supported")
 #endif
 
 /* --- */
