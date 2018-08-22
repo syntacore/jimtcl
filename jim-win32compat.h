@@ -10,6 +10,8 @@ extern "C" {
 /* Note that at this point we don't yet have access to jimautoconf.h */
 #if defined(_WIN32) || defined(WIN32)
 
+#define __attribute__(V)
+
 #define HAVE_DLOPEN
 void *dlopen(const char *path, int mode);
 int dlclose(void *handle);
@@ -44,10 +46,12 @@ char *dlerror(void);
 
 #include <io.h>
 
+#ifndef _WINSOCKAPI_
 struct timeval {
 	long tv_sec;
 	long tv_usec;
 };
+#endif
 
 int gettimeofday(struct timeval *tv, void *unused);
 
