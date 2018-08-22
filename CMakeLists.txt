@@ -1,8 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(jimtcl)
+set(JIM_VERSION 77)
+set(JIM_REGEXP ON)
+configure_file(jim-config.h.cmin jim-config.h @ONLY NEWLINE_STYLE UNIX)
+configure_file(jimautoconf.h.cmin jimautoconf.h @ONLY NEWLINE_STYLE UNIX)
 
 add_library(libjim
+    ${CMAKE_CURRENT_BINARY_DIR}/jimautoconf.h
+    ${CMAKE_CURRENT_BINARY_DIR}/jim-config.h
+
     jim.h
     jim-eventloop.h
     jimiocompat.h
@@ -54,8 +61,11 @@ add_library(libjim
     )
 set_property(TARGET libjim PROPERTY C_STANDARD 99)
 set_target_properties(libjim PROPERTIES FOLDER "libs")
+target_include_directories(libjim PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(libjim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(jimsh
     jimsh.c
     )
 set_property(TARGET jimsh PROPERTY C_STANDARD 99)
+target_link_libraries(jimsh libjim)

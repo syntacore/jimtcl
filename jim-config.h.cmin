@@ -1,0 +1,2 @@
+/* Public autoconf settings */
+#cmakedefine DEFINE_HAVE_LONG_LONG HAVE_LONG_LONG
