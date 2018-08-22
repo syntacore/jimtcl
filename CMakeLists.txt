@@ -1,14 +1,32 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(jimtcl)
+project(jimsh)
+
+find_package(SDL2 REQUIRED)
+find_package(tclsh)
+#find_package(findsqlite)
+#set(Readline_INCLUDE_DIR C:/cygwin64/usr/i686-w64-mingw32/sys-root/mingw/include/readline/readline.h)
+#find_package(Readline)
+
+include_directories(${SDL2_INCLUDE_DIRS})
+
 set(JIM_VERSION 77)
 set(JIM_REGEXP ON)
 configure_file(jim-config.h.cmin jim-config.h @ONLY NEWLINE_STYLE UNIX)
 configure_file(jimautoconf.h.cmin jimautoconf.h @ONLY NEWLINE_STYLE UNIX)
 
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/_load-static-exts.c
+    COMMAND ${TCL_TCLSH} ${CMAKE_CURRENT_SOURCE_DIR}/make-load-static-exts.tcl 
+    aio array clock eventloop exec file history interp load namespace pack package posix readdir regexp signal syslog glob nshelper oo stdlib tclcompat tree 
+    >${CMAKE_CURRENT_BINARY_DIR}/_load-static-exts.c
+    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/make-load-static-exts.tcl
+    )
+
 add_library(libjim
     ${CMAKE_CURRENT_BINARY_DIR}/jimautoconf.h
     ${CMAKE_CURRENT_BINARY_DIR}/jim-config.h
+    ${CMAKE_CURRENT_BINARY_DIR}/_load-static-exts.c
 
     jim.h
     jim-eventloop.h
@@ -22,7 +40,7 @@ add_library(libjim
     utf8.h
     
     jim.c
-    jim-aio.c
+    #jim-aio.c
     jim-array.c
     jim-clock.c
     jim-eventloop.c
@@ -37,13 +55,13 @@ add_library(libjim
     jim-namespace.c
     jim-nosignal.c
     jim-pack.c
-    jim-package.c
+    #jim-package.c
     jim-posix.c
     jim-readdir.c
     jim-readline.c
     jimregexp.c
     jim-regexp.c
-    jim-sdl.c
+    #jim-sdl.c
     jimsh.c
     jim-signal.c
     jim-sqlite3.c
@@ -57,15 +75,16 @@ add_library(libjim
     linenoise.c
     utf8.c
     
-    jim-mk.cpp
+    #jim-mk.cpp
     )
 set_property(TARGET libjim PROPERTY C_STANDARD 99)
-set_target_properties(libjim PROPERTIES FOLDER "libs")
-target_include_directories(libjim PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(libjim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(libjim PROPERTIES FOLDER "jimtcl")
+target_include_directories(libjim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(jimsh
     jimsh.c
     )
 set_property(TARGET jimsh PROPERTY C_STANDARD 99)
+set_property(TARGET jimsh PROPERTY EXCLUDE_FROM_ALL)
 target_link_libraries(jimsh libjim)
+set_target_properties(jimsh PROPERTIES FOLDER "jimtcl")
